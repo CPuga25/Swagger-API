@@ -258,6 +258,43 @@ const studentID = id;
  *     summary: Update an item by ID
  *     seucrity:
  *         - bearerAuth:[]
+ *     requestBody:
+ *       required: true
+ *       content: 
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *                 description: "The student's first name"
+ *               lastName:
+ *                 type: string
+ *                 description: "The student's last name"
+ *               age:
+ *                 type: integer
+ *                 description: "The student's age"
+ *               email:
+ *                 type: string
+ *                 description: "The student's email address"
+ *               enrollmentNumber:
+ *                 type: string
+ *                 description: "The student's enrollment number"
+ *               courses:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     courseId:
+ *                       type: integer
+ *                     courseName:
+ *                       type: string
+ *                     grade:
+ *                       type: string
+ *               status:
+ *                 type: string
+ *                 description: "The student's status"
+ *                 example: "active"
  *     parameters:
  *       - in: path
  *         name: id
@@ -273,7 +310,7 @@ app.put('/items/:id',authenticateToken, (req, res) => {
   const id = parseInt(req.params.id);
   const studentIndex = students.findIndex(student => student.id ===id);
 
-  if(studentIndex !==1){
+  if(studentIndex !==-1){
     const updateStudent = {... students[studentIndex], ...req.body};
     students[studentIndex] = updateStudent;
     res.status(200).json(updateStudent);
@@ -303,6 +340,7 @@ app.put('/items/:id',authenticateToken, (req, res) => {
  *         description: Item deleted successfully
  */
 app.delete('/items/:id', authenticateToken,(req, res) => {
+
   res.status(200).json({ message: `DELETE request - Delete item with ID ${req.params.id}` });
 });
 
