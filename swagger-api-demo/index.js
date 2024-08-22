@@ -12,6 +12,68 @@ const users = [
   {id:3, username: 'Daniel',password: '1234'}
 ]
 
+const students = [
+  {
+    "id": 1,
+    "firstName": "Jose",
+    "lastName": "Montaño",
+    "age": 21,
+    "email": "Jose@axity.com",
+    "enrollmentNumber": "2024-001",
+    "courses": [
+      {
+        "courseId": 101,
+        "courseName": "Introduction to Programming",
+        "grade": "A"
+      },
+      {
+        "courseId": 102,
+        "courseName": "Data Structures"
+      }
+    ],
+    "status": "active"
+  },
+  {
+    "id": 2,
+    "firstName": "Joshua",
+    "lastName": "Hernandez",
+    "age": 24,
+    "email": "Jhernandez@axity.com",
+    "enrollmentNumber": "2024-002",
+    "courses": [
+      {
+        "courseId": 101,
+        "courseName": "Introduction to Programming",
+        "grade": "A"
+      },
+      {
+        "courseId": 102,
+        "courseName": "Data Structures"
+      }
+    ],
+    "status": "active"
+  },
+  {
+    "id": 3,
+    "firstName": "Ihoky",
+    "lastName": "Almaraz",
+    "age": 22,
+    "email": "IAlmaraz@axity.com",
+    "enrollmentNumber": "2024-001",
+    "courses": [
+      {
+        "courseId": 101,
+        "courseName": "Introduction to Programming",
+        "grade": "A"
+      },
+      {
+        "courseId": 102,
+        "courseName": "Data Structures"
+      }
+    ],
+    "status": "active"
+  }
+]
 /**
  * @swagger
  * /login:
@@ -57,7 +119,14 @@ app.post('/login', (req, res) => {
  *         description: A list of items
  */
 app.get('/items', authenticateToken,  (req, res) => {
-  res.status(200).json({ message: 'GET request - Retrieve items' });
+  const id = parseInt(req.params.id);
+  const student = students.find(student => student.id ===id);
+
+  if(student){
+    res.status(200).json(student);
+  }else{
+    res.status(404).json({message: `No se encontro el id ${id}`});
+  }
 });
 
 /**
@@ -67,12 +136,94 @@ app.get('/items', authenticateToken,  (req, res) => {
  *     summary: Create a new item
  *     seucrity:
  *         - bearerAuth:[]
- *     responses:
+ *     requestBody:
+ *       required: true
+ *       content: 
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *                 description: "The student's first name"
+ *               lastName:
+ *                 type: string
+ *                 description: "The student's last name"
+ *               age:
+ *                 type: integer
+ *                 description: "The student's age"
+ *               email:
+ *                 type: string
+ *                 description: "The student's email address"
+ *               enrollmentNumber:
+ *                 type: string
+ *                 description: "The student's enrollment number"
+ *               courses:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     courseId:
+ *                       type: integer
+ *                     courseName:
+ *                       type: string
+ *                     grade:
+ *                       type: string
+ *               status:
+ *                 type: string
+ *                 description: "The student's status"
+ *                 example: "active"
+*     responses:
  *       201:
- *         description: Item created successfully
+ *         description: Student created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 firstName:
+ *                   type: string
+ *                 lastName:
+ *                   type: string
+ *                 age:
+ *                   type: integer
+ *                 email:
+ *                   type: string
+ *                 enrollmentNumber:
+ *                   type: string
+ *                 courses:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       courseId:
+ *                         type: integer
+ *                       courseName:
+ *                         type: string
+ *                       grade:
+ *                         type: string
+ *                 status:
+ *                   type: string
  */
 app.post('/items',authenticateToken, (req, res) => {
-  res.status(201).json({ message: 'POST request - Create item' });
+  const {firstName, lastName,age,email,enrollmentNumber,courses,status} = req.body;
+  const studentObject = {
+    id: students.length + 1,
+    firstName,
+    lastName,
+    age,
+    email,
+    enrollmentNumber,
+    courses,
+    status
+  }
+  students.push(studentObject);
+  res.status(201).json({ 
+    message: 'Se ha agregado un estudiante',
+    estudiante: studentObject
+  });
 });
 
 /**
@@ -93,8 +244,11 @@ app.post('/items',authenticateToken, (req, res) => {
  *       200:
  *         description: A single item
  */
+
 app.get('/items/:id',authenticateToken, (req, res) => {
-  res.status(200).json({ message: `GET request - Retrieve item with ID ${req.params.id}` });
+const {id} = req.body;
+const studentID = id;
+  res.status(200).json({ message: `GET request - Retrieve item with ID ${students.studentID}` });
 });
 
 /**
@@ -116,7 +270,18 @@ app.get('/items/:id',authenticateToken, (req, res) => {
  *         description: Item updated successfully
  */
 app.put('/items/:id',authenticateToken, (req, res) => {
-  res.status(200).json({ message: `PUT request - Update item with ID ${req.params.id}` });
+  const id = parseInt(req.params.id);
+  const studentIndex = students.findIndex(student => student.id ===id);
+
+  if(studentIndex !==1){
+    const updateStudent = {... students[studentIndex], ...req.body};
+    students[studentIndex] = updateStudent;
+    res.status(200).json(updateStudent);
+  }else{
+    res.status(200).json({ message: `No se encontro el id ${id}` });
+  }
+  
+ 
 });
 
 /**
